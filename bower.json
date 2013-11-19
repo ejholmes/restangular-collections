@@ -1,0 +1,21 @@
+{
+  "name": "restangular-collections",
+  "version": "0.0.1",
+  "main": "./dist/restangular-collections.min.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/remind101/restangular.git"
+  },
+  "dependencies": {
+    "restangular": ">= 1.0",
+    "angular": "*"
+  },
+  "devDependencies": {
+    "angular-mocks": "*"
+  },
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "lib"
+  ]
+}
