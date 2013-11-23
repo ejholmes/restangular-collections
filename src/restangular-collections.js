@@ -6,7 +6,7 @@
       id: 'id',
       methods: {
         create: 'create',
-        destroy: 'destroy'
+        remove: 'remove'
       }
     };
 
@@ -33,7 +33,7 @@
    * Destroys an item and removes it from the collection.
    */
   Collection.prototype.destroy = function(item) {
-    var promise = item[this.options.methods.destroy]();
+    var promise = item[this.options.methods.remove]();
     return promise.then(_.bind(this.remove, this));
   };
 
@@ -50,7 +50,7 @@
       find = function(existing) { return existing === item; };
     };
 
-    return _.find(this.array, find) || item[id] && this.find(item.id);
+    return _.find(this.array, find) || item[id] && this.find(item[id]);
   };
 
   /*

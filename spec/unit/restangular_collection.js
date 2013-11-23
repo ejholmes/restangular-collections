@@ -77,7 +77,7 @@ describe('restangularCollections', function() {
       beforeEach(function() {
         deferred = promise();
 
-        item = { body: 'Foobar', destroy: function() { return deferred.promise; } };
+        item = { body: 'Foobar', remove: function() { return deferred.promise; } };
 
         collection.add(item);
         
@@ -85,7 +85,7 @@ describe('restangularCollections', function() {
       });
 
       it('destroys the item', function() {
-        mock.expects('destroy').returns(deferred.promise);
+        mock.expects('remove').returns(deferred.promise);
         collection.destroy(item);
       });
 
