@@ -1,45 +1,27 @@
 describe('restangularCollections', function() {
-  var client, Collection;
+  var Collection;
 
   beforeEach(module('restangularCollections'));
 
-  beforeEach(inject(function(Restangular, RestangularCollection) {
-    client = Restangular;
+  beforeEach(inject(function(RestangularCollection) {
     Collection = RestangularCollection;
   }));
 
-  disableHTTP(this);
-
-  describe('config', function() {
-    describe('getCollection()', function() {
-      var elem, posts;
-
-      beforeEach(function() {
-        elem = client.all('posts')
-        posts = elem.getCollection();
-      });
-
-      it('is a collection', function() {
-        expect(posts).to.be.an.instanceof(Collection);
-      });
-
-      it('sets the restangularElem attribute', function() {
-        expect(posts.restangularElem).to.eq(elem);
-      })
-    });
-  });
-
   describe('RestangularCollection', function() {
-    var elem, collection;
+    var restangularElem, collection;
 
     beforeEach(function() {
-      elem = sinon.stub();
-      collection = new Collection(elem);
+      restangularElem = {
+        create: function() { },
+        getList: function() { }
+      };
+
+      collection = new Collection(restangularElem);
     });
 
     describe('constructor', function() {
       it('sets the restangularElem attribute', function() {
-        expect(collection.restangularElem).to.eq(elem);
+        expect(collection.restangularElem).to.eq(restangularElem);
       });
 
       it('sets the array attribute', function() {
@@ -66,6 +48,51 @@ describe('restangularCollections', function() {
           collection.reset();
           expect(collection.array).to.eq(ref);
         });
+      });
+    });
+
+    describe('#create', function() {
+      var item, mock, deferred;
+
+      beforeEach(function() {
+        item = { body: 'Foobar' };
+
+        mock = sinon.mock(restangularElem);
+
+        deferred = promise();
+
+        restangularElem.create = function() { return deferred.promise; };
+      });
+
+      it('adds the resolved item to the collection', function() {
+        collection.create(item);
+        deferred.resolve(item);
+        expect(collection.array).to.contain(item);
+      });
+    });
+
+    describe('#destroy', function() {
+      var item, mock, deferred;
+
+      beforeEach(function() {
+        deferred = promise();
+
+        item = { body: 'Foobar', destroy: function() { return deferred.promise; } };
+
+        collection.add(item);
+        
+        mock= sinon.mock(item);
+      });
+
+      it('destroys the item', function() {
+        mock.expects('destroy').returns(deferred.promise);
+        collection.destroy(item);
+      });
+
+      it('removes the item from the collection', function() {
+        collection.destroy(item);
+        deferred.resolve(item);
+        expect(collection.array.length).to.eq(0);
       });
     });
 
@@ -98,6 +125,13 @@ describe('restangularCollections', function() {
           expect(found).to.be.undefined;
         });
       });
+
+      describe('when given an object with a different reference, but an existing id', function() {
+        it('returns the existing object', function() {
+          var found = collection.find({ id: 1, body: 'Yo yo' });
+          expect(found).to.eq(item);
+        });
+      });
     });
 
     describe('#add', function() {
@@ -120,6 +154,17 @@ describe('restangularCollections', function() {
         it('does not add the duplicate item to the array', function() {
           collection.add(item);
           expect(collection.array.length).to.eq(1);
+        });
+      });
+
+      describe('when the item is in the collection but the references do not match', function() {
+        beforeEach(function() {
+          collection.add(item);
+          collection.add({ id: 1, body: 'Barfoo' });
+        });
+
+        it('updates the existing item', function() {
+          expect(item.body).to.eq('Barfoo');
         });
       });
     });
@@ -197,6 +242,36 @@ describe('restangularCollections', function() {
           angular.forEach(items, function(item) {
             expect(collection.array).to.not.contain(item);
           });
+        });
+      });
+    });
+
+    describe('#getList', function() {
+      var mock, deferred, items;
+
+      beforeEach(function() {
+        items = [
+          { id: 1, body: 'Foobar' },
+          { id: 2, body: 'Barfoo' }
+        ]
+
+        deferred = promise();
+
+        restangularElem.getList = function() { return deferred.promise; };
+
+        mock = sinon.mock(restangularElem);
+      });
+
+      it('delegates to the restangularElem', function() {
+        mock.expects('getList').withArgs(1).returns(deferred.promise);
+        collection.getList(1);
+      });
+
+      it('adds all items to the collection when resolved', function() {
+        collection.getList();
+        deferred.resolve(items);
+        angular.forEach(items, function(item) {
+          expect(collection.array).to.contain(item);
         });
       });
     });

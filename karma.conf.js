@@ -30,12 +30,14 @@ module.exports = function(config) {
       'node_modules/sinon/lib/sinon.js',
       'node_modules/sinon/lib/sinon/spy.js',
       'node_modules/sinon/lib/sinon/stub.js',
+      'node_modules/sinon/lib/sinon/mock.js',
       'node_modules/sinon/lib/sinon/match.js',
       'spec/lib/*.js',
       'spec/helper.js',
 
       // Spec files
-      'spec/unit/**/*.js'
+      'spec/unit/**/*.js',
+      'spec/integration/**/*.js'
     ],
 
     // list of files / patterns to exclude
