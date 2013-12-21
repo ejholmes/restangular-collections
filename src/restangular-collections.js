@@ -121,6 +121,7 @@
 
     if (existing) {
       this.models.splice(_.indexOf(this.models, model), 1);
+      this._removeReference(existing);
       this.length--;
     }
 
@@ -146,10 +147,23 @@
 
   /**
    * Adds a reference to the provided model to reference this collection.
+   *
+   * @param {Object} model - The model to add the reference to.
    */
   Collection.prototype._addReference = function(model) {
     if (!model.collection) {
       model.collection = this;
+    }
+  };
+
+  /**
+   * Removes the reference to this collection from the model.
+   *
+   * @param {Object} model - The model to remove the reference from.
+   */
+  Collection.prototype._removeReference = function(model) {
+    if (this === model.collection) {
+      delete model.collection;
     }
   };
 

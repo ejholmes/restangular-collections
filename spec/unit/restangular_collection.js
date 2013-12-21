@@ -231,6 +231,11 @@ describe('restangularCollections', function() {
           expect(collection.models).to.not.contain(model);
         });
 
+        it('removes the reference to the collection', function() {
+          collection.remove(model);
+          expect(model.collection).to.be.undefined;
+        });
+
         it('decrements the length', function() {
           collection.remove(model);
           expect(collection.length).to.eq(0);
