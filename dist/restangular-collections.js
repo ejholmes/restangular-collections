@@ -1,4 +1,4 @@
-/*! restangular-collections - v0.0.1 - 2013-12-21 */(function (angular) {
+/*! restangular-collections - v0.0.2 - 2013-12-21 */(function (angular) {
   'use strict';
   var module = angular.module('restangularCollections', ['restangular']);
   function Collection(elem, options) {
@@ -86,8 +86,16 @@
     function (RestangularProvider) {
       RestangularProvider.setOnElemRestangularized(function (elem, isCollection, what, Restangular) {
         if (isCollection) {
-          elem.getCollection = function () {
-            return new Collection(elem);
+          elem.getCollection = function (options) {
+            options = options || {};
+            var collection = new Collection(elem, options);
+            if (options.fetch) {
+              return collection.getList().then(function () {
+                return collection;
+              });
+            } else {
+              return collection;
+            }
           };
         }
         return elem;
