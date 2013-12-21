@@ -20,7 +20,7 @@
 
     // Reset the collection to it's initial state.
     this.reset();
-  };
+  }
 
   /*
    * Creates a new item and adds it to the collection.
@@ -48,7 +48,7 @@
       find = function(existing) { return existing[id] === item; };
     } else {
       find = function(existing) { return existing === item; };
-    };
+    }
 
     return _.find(this.array, find) || item[id] && this.find(item[id]);
   };
@@ -94,7 +94,7 @@
 
     if (existing) {
       this.array.splice(_.indexOf(this.array, item), 1);
-    };
+    }
 
     return item;
   };
@@ -117,7 +117,7 @@
    * A proxy to the underlying getList
    */
   Collection.prototype.getList = function() {
-    var promise = this.restangularElem.getList.apply(this.restangularElem, arguments)
+    var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
 
     return promise.then(_.bind(this.addAll, this));
   };
@@ -129,7 +129,7 @@
         if (isCollection) {
           elem.getCollection = function() {
             return new Collection(elem);
-          }
+          };
         }
 
         return elem;

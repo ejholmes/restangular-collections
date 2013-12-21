@@ -9,12 +9,12 @@ module.exports = function (grunt) {
         configFile: 'karma.conf.js',
         singleRun: process.env.CI
       }
+    },
+    jshint: {
+      all: ['src/**/*.js', 'spec/**/*.js']
     }
   });
 
-  grunt.registerTask('test', ['karma:unit'])
-
-  grunt.registerTask('default', [
-    'test'
-  ]);
+  grunt.registerTask('test', ['jshint', 'karma:unit'])
+  grunt.registerTask('default', ['test']);
 };

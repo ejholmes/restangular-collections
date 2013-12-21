@@ -1,3 +1,4 @@
+/* jshint -W030 */
 describe('restangularCollections', function() {
   var Collection;
 
@@ -176,7 +177,7 @@ describe('restangularCollections', function() {
         items = [
           { id: 1, body: 'Foobar' },
           { id: 2, body: 'Barfoo' }
-        ]
+        ];
       });
 
       it('adds all items to the array', function() {
@@ -229,7 +230,7 @@ describe('restangularCollections', function() {
         items = [
           { id: 1, body: 'Foobar' },
           { id: 2, body: 'Barfoo' }
-        ]
+        ];
       });
 
       describe('when the items are in the collection', function() {
@@ -253,7 +254,7 @@ describe('restangularCollections', function() {
         items = [
           { id: 1, body: 'Foobar' },
           { id: 2, body: 'Barfoo' }
-        ]
+        ];
 
         deferred = promise();
 
@@ -276,4 +277,4 @@ describe('restangularCollections', function() {
       });
     });
   });
-})
+});

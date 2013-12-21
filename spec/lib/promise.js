@@ -3,7 +3,7 @@
  * inside a $scope.$apply.
  */
 function promise() {
-  var promise;
+  var p;
 
   inject(function($rootScope, $q) {
     var apply;
@@ -16,15 +16,15 @@ function promise() {
         $rootScope.$apply(function() {
           deferred[name].apply(deferred, args);
         });
-      }
-    }
+      };
+    };
 
-    promise = {
+    p = {
       promise: deferred.promise,
       resolve: apply('resolve'),
       reject: apply('reject')
     };
   });
 
-  return promise;
-};
+  return p;
+}

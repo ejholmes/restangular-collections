@@ -27,7 +27,7 @@ describe('restangularCollection', function() {
     var elem, posts;
 
     beforeEach(function() {
-      elem = client.all('posts')
+      elem = client.all('posts');
       posts = elem.getCollection();
     });
 
