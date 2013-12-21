@@ -23,7 +23,7 @@ function PostsCtrl (posts) {
   // resolved. The new post will be added to the posts collection.
   posts.create(body: "Foobar").then(function(post) {
     // Destroy an existing post and remove it from the collection.
-    posts.destroy(post);
+    post.destroy();
   });
 }
 ```
