@@ -183,8 +183,25 @@
   module.config(function(RestangularProvider) {
     RestangularProvider.setOnElemRestangularized(function(elem, isCollection, what, Restangular) {
       if (isCollection) {
-        elem.getCollection = function() {
-          return new Collection(elem);
+
+        /**
+         * Builds a new Collection and returns it.
+         *
+         * @param {Object} options - A hash of options to pass along to the
+         * Collection class.
+         *
+         * @return {Object|Promise}
+         */
+        elem.getCollection = function(options) {
+          options = options || {};
+
+          var collection = new Collection(elem, options);
+
+          if (options.fetch) {
+            return collection.getList().then(function() { return collection; });
+          } else {
+            return collection;
+          }
         };
       }
 
