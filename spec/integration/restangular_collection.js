@@ -44,8 +44,8 @@ describe('restangularCollection', function() {
         this.$httpBackend.flush();
       });
 
-      it('creates the item and adds it to the collection', function() {
-        expect(posts.array.length).to.eq(1);
+      it('creates the model and adds it to the collection', function() {
+        expect(posts.models.length).to.eq(1);
       });
     });
   });
