@@ -33,7 +33,9 @@
    * @return {Promise}
    */
   Collection.prototype.create = function(attributes) {
-    return this.restangularElem[this.options.methods.create](attributes).then(_.bind(this.add, this));
+    var create = this.restangularElem[this.options.methods.create];
+
+    return create(attributes).then(_.bind(this.add, this));
   };
 
   /**
@@ -44,8 +46,9 @@
    * @return {Promise}
    */
   Collection.prototype.destroy = function(model) {
-    var promise = model[this.options.methods.remove]();
-    return promise.then(_.bind(this.remove, this));
+    var destroy = model[this.options.methods.remove];
+
+    return destroy().then(_.bind(this.remove, this));
   };
 
   /**
