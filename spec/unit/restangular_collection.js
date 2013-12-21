@@ -72,31 +72,6 @@ describe('restangularCollections', function() {
       });
     });
 
-    describe('#destroy', function() {
-      var model, mock, deferred;
-
-      beforeEach(function() {
-        deferred = promise();
-
-        model = { body: 'Foobar', remove: function() { return deferred.promise; } };
-
-        collection.add(model);
-        
-        mock= sinon.mock(model);
-      });
-
-      it('destroys the model', function() {
-        mock.expects('remove').returns(deferred.promise);
-        collection.destroy(model);
-      });
-
-      it('removes the model from the collection', function() {
-        collection.destroy(model);
-        deferred.resolve(model);
-        expect(collection.models.length).to.eq(0);
-      });
-    });
-
     describe('#find', function() {
       var model;
 
@@ -294,6 +269,24 @@ describe('restangularCollections', function() {
         angular.forEach(models, function(model) {
           expect(collection.models).to.contain(model);
         });
+      });
+    });
+
+    describe('model.destroy', function() {
+      var model, deferred;
+
+      beforeEach(function() {
+        deferred = promise();
+
+        model = { id: 1, body: 'Foobar', remove: function() { return deferred.promise; } };
+
+        collection.add(model);
+      });
+
+      it('destroys the model and removes it from the collection', function() {
+        model.destroy();
+        deferred.resolve(model);
+        expect(collection.models).to.not.include(model);
       });
     });
   });

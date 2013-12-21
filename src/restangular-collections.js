@@ -8,8 +8,7 @@
     var defaults = {
       id: 'id',
       methods: {
-        create: 'create',
-        remove: 'remove'
+        create: 'create'
       }
     };
 
@@ -36,19 +35,6 @@
     var create = this.restangularElem[this.options.methods.create];
 
     return create(attributes).then(_.bind(this.add, this));
-  };
-
-  /**
-   * Destroys a model and removes it from the collection.
-   *
-   * @param {Object} model - A reference to a model in this collection.
-   *
-   * @return {Promise}
-   */
-  Collection.prototype.destroy = function(model) {
-    var destroy = model[this.options.methods.remove];
-
-    return destroy().then(_.bind(this.remove, this));
   };
 
   /**
@@ -157,8 +143,20 @@
    * @param {Object} model - The model to add the reference to.
    */
   Collection.prototype._addReference = function(model) {
+    var collection = this;
+
     if (!model.collection) {
-      model.collection = this;
+      model.collection = collection;
+
+      /**
+       * A method to call restangular's remove to DELETE the resource, then
+       * remove it from the collection.
+       *
+       * @return {Promise}
+       */
+      model.destroy = function() {
+        return model.remove().then(_.bind(collection.remove, collection));
+      };
     }
   };
 
