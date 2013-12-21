@@ -1,5 +1,7 @@
 ## Restangular Collections
 
+[![Build Status](https://travis-ci.org/ejholmes/restangular-collections.png?branch=master)](https://travis-ci.org/ejholmes/restangular-collections)
+
 This is a small extension to restangular that adds a `getCollection()` function
 to restangularized routes.
 
