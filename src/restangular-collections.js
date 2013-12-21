@@ -193,12 +193,13 @@
   });
 
   module.provider('RestangularCollection', function() {
-    var config = this;
-
-    this.collectionClass = Collection;
+    var collectionClass = Collection;
+    this.setCollectionClass = function(klass) {
+      collectionClass = klass;
+    };
 
     this.$get = function() {
-      return config.collectionClass;
+      return collectionClass;
     };
   });
 
