@@ -1,4 +1,5 @@
 (function(angular) {
+  'use strict';
 
   function Collection(elem, options) {
     // Default options.
@@ -176,28 +177,28 @@
     return promise.then(_.bind(this.addAll, this));
   };
 
-  angular.module('restangularCollections', ['restangular'])
+  var module = angular.module('restangularCollections', ['restangular']);
 
-    .config(function(RestangularProvider) {
-      RestangularProvider.setOnElemRestangularized(function(elem, isCollection, what, Restangular) {
-        if (isCollection) {
-          elem.getCollection = function() {
-            return new Collection(elem);
-          };
-        }
+  module.config(function(RestangularProvider) {
+    RestangularProvider.setOnElemRestangularized(function(elem, isCollection, what, Restangular) {
+      if (isCollection) {
+        elem.getCollection = function() {
+          return new Collection(elem);
+        };
+      }
 
-        return elem;
-      });
-    })
-
-    .provider('RestangularCollection', function() {
-      var config = this;
-
-      this.collectionClass = Collection;
-
-      this.$get = function() {
-        return config.collectionClass;
-      };
+      return elem;
     });
+  });
+
+  module.provider('RestangularCollection', function() {
+    var config = this;
+
+    this.collectionClass = Collection;
+
+    this.$get = function() {
+      return config.collectionClass;
+    };
+  });
 
 })(angular);
