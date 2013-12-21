@@ -152,6 +152,11 @@ describe('restangularCollections', function() {
         expect(item.collection).to.eq(collection);
       });
 
+      it('increments the length', function() {
+        collection.add(item);
+        expect(collection.length).to.eq(1);
+      });
+
       describe('when the item is already in the collection', function() {
         beforeEach(function() {
           collection.add(item);
@@ -224,6 +229,11 @@ describe('restangularCollections', function() {
         it('removes the item from the collection', function() {
           collection.remove(item);
           expect(collection.array).to.not.contain(item);
+        });
+
+        it('decrements the length', function() {
+          collection.remove(item);
+          expect(collection.length).to.eq(0);
         });
       });
     });

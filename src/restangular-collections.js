@@ -82,6 +82,7 @@
       }
     } else {
       this.array.push(item);
+      this.length++;
       this._addReference(item);
     }
 
@@ -120,6 +121,7 @@
 
     if (existing) {
       this.array.splice(_.indexOf(this.array, item), 1);
+      this.length--;
     }
 
     return item;
@@ -139,6 +141,7 @@
    */
   Collection.prototype.reset = function() {
     this.array.length = 0;
+    this.length = 0;
   };
 
   /**
