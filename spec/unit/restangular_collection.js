@@ -147,6 +147,11 @@ describe('restangularCollections', function() {
         expect(collection.array).to.contain(item);
       });
 
+      it('adds a reference to to the collection', function() {
+        collection.add(item);
+        expect(item.collection).to.eq(collection);
+      });
+
       describe('when the item is already in the collection', function() {
         beforeEach(function() {
           collection.add(item);

@@ -82,7 +82,7 @@
       }
     } else {
       this.array.push(item);
-      this.length += 1;
+      this._addReference(item);
     }
 
     return item;
@@ -139,6 +139,15 @@
    */
   Collection.prototype.reset = function() {
     this.array.length = 0;
+  };
+
+  /**
+   * Adds a reference to the provided item to reference this collection.
+   */
+  Collection.prototype._addReference = function(item) {
+    if (!item.collection) {
+      item.collection = this;
+    }
   };
 
   /**
