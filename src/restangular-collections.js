@@ -1,6 +1,8 @@
 (function(angular) {
   'use strict';
 
+  var module = angular.module('restangularCollections', ['restangular']);
+
   function Collection(elem, options) {
     // Default options.
     var defaults = {
@@ -176,8 +178,6 @@
 
     return promise.then(_.bind(this.addAll, this));
   };
-
-  var module = angular.module('restangularCollections', ['restangular']);
 
   module.config(function(RestangularProvider) {
     RestangularProvider.setOnElemRestangularized(function(elem, isCollection, what, Restangular) {
