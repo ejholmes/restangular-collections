@@ -59,6 +59,17 @@
   };
 
   /**
+   * Returns the model at the given index.
+   *
+   * @param {Integer} index - The index of the model.
+   *
+   * @return {Object}
+   */
+  Collection.prototype.at = function(index) {
+    return this.models[index];
+  };
+
+  /**
    * Add a model to the collection.
    *
    * @param {Object} model - The model to add to the collection.

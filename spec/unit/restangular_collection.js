@@ -110,6 +110,19 @@ describe('restangularCollections', function() {
       });
     });
 
+    describe('#at', function() {
+      var model;
+
+      beforeEach(function() {
+        model = { id: 1, body: 'Foobar' };
+        collection.add(model);
+      });
+
+      it('returns the model at the index', function() {
+        expect(collection.at(0)).to.eq(model);
+      });
+    });
+
     describe('#add', function() {
       var model;
 
