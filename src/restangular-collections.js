@@ -24,172 +24,175 @@
     this.reset();
   }
 
-  /**
-   * Creates a new model and adds it to the collection.
-   *
-   * @param {Object} attributes - A hash of attributes to create the model with.
-   *
-   * @return {Promise}
-   */
-  Collection.prototype.create = function(attributes) {
-    var create = this.restangularElem[this.options.methods.create];
+  _.extend(Collection.prototype, {
 
-    return create(attributes).then(_.bind(this.add, this));
-  };
+    /**
+     * Creates a new model and adds it to the collection.
+     *
+     * @param {Object} attributes - A hash of attributes to create the model with.
+     *
+     * @return {Promise}
+     */
+    create: function(attributes) {
+      var create = this.restangularElem[this.options.methods.create];
 
-  /**
-   * Find a model from the collection.
-   *
-   * @param {Object} model - Can be an id, a reference to a model that's already
-   * in this collection, or an object with an `id` attribute.
-   *
-   * @return {Object} The found object or undefined if not found.
-   */
-  Collection.prototype.find = function(model) {
-    var id = this.options.id,
-        find;
+      return create(attributes).then(_.bind(this.add, this));
+    },
 
-    if (_.isNumber(model)) {
-      find = function(existing) { return existing[id] === model; };
-    } else {
-      find = function(existing) { return existing === model; };
-    }
+    /**
+     * Find a model from the collection.
+     *
+     * @param {Object} model - Can be an id, a reference to a model that's already
+     * in this collection, or an object with an `id` attribute.
+     *
+     * @return {Object} The found object or undefined if not found.
+     */
+    find: function(model) {
+      var id = this.options.id,
+          find;
 
-    return _.find(this.models, find) || model[id] && this.find(model[id]);
-  };
-
-  /**
-   * Returns the model at the given index.
-   *
-   * @param {Integer} index - The index of the model.
-   *
-   * @return {Object}
-   */
-  Collection.prototype.at = function(index) {
-    return this.models[index];
-  };
-
-  /**
-   * Add a model to the collection.
-   *
-   * @param {Object} model - The model to add to the collection.
-   *
-   * @return {Object} The model that was provided.
-   */
-  Collection.prototype.add = function(model) {
-    var existing = this.find(model);
-
-    if (existing) {
-      if (existing != model) {
-        this.replace(existing, model);
+      if (_.isNumber(model)) {
+        find = function(existing) { return existing[id] === model; };
+      } else {
+        find = function(existing) { return existing === model; };
       }
-    } else {
-      this.models.push(model);
-      this.length++;
-      this._addReference(model);
+
+      return _.find(this.models, find) || model[id] && this.find(model[id]);
+    },
+
+    /**
+     * Returns the model at the given index.
+     *
+     * @param {Integer} index - The index of the model.
+     *
+     * @return {Object}
+     */
+    at: function(index) {
+      return this.models[index];
+    },
+
+    /**
+     * Add a model to the collection.
+     *
+     * @param {Object} model - The model to add to the collection.
+     *
+     * @return {Object} The model that was provided.
+     */
+    add: function(model) {
+      var existing = this.find(model);
+
+      if (existing) {
+        if (existing != model) {
+          this.replace(existing, model);
+        }
+      } else {
+        this.models.push(model);
+        this.length++;
+        this._addReference(model);
+      }
+
+      return model;
+    },
+
+    /**
+     * Replaces the existing model with the new model, by copying all the
+     * attributes.
+     *
+     * @param {Object} existing - The existing model to replace.
+     * @param {Object} model    - The model to replace the existing model with.
+     */
+    replace: function(existing, model) {
+      angular.copy(model, existing);
+    },
+
+    /**
+     * Add an array of models to the collection.
+     *
+     * @param {Array} models - An array of models to add to the collection.
+     */
+    addAll: function(models) {
+      return angular.forEach(models, _.bind(this.add, this));
+    },
+
+    /**
+     * Remove a model from the collection.
+     *
+     * @param {Object} model - The model to remove from the collection.
+     *
+     * @return {Object} The model that was provided.
+     */
+    remove: function(model) {
+      var existing = this.find(model);
+
+      if (existing) {
+        this.models.splice(_.indexOf(this.models, model), 1);
+        this._removeReference(existing);
+        this.length--;
+      }
+
+      return model;
+    },
+
+    /**
+     * Remove all models from the collection.
+     *
+     * @param {Array} models - An array of models to remove from the collection.
+     */
+    removeAll: function(models) {
+      return angular.forEach(models, _.bind(this.remove, this));
+    },
+
+    /**
+     * Reset the collection.
+     */
+    reset: function() {
+      this.models.length = 0;
+      this.length = 0;
+    },
+
+    /**
+     * Adds a reference to the provided model to reference this collection.
+     *
+     * @param {Object} model - The model to add the reference to.
+     */
+    _addReference: function(model) {
+      var collection = this;
+
+      if (!model.collection) {
+        model.collection = collection;
+
+        /**
+         * A method to call restangular's remove to DELETE the resource, then
+         * remove it from the collection.
+         *
+         * @return {Promise}
+         */
+        model.destroy = function() {
+          return model.remove().then(_.bind(collection.remove, collection));
+        };
+      }
+    },
+
+    /**
+     * Removes the reference to this collection from the model.
+     *
+     * @param {Object} model - The model to remove the reference from.
+     */
+    _removeReference: function(model) {
+      if (this === model.collection) {
+        delete model.collection;
+      }
+    },
+
+    /**
+     * A proxy to the underlying getList
+     */
+    getList: function() {
+      var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
+
+      return promise.then(_.bind(this.addAll, this));
     }
-
-    return model;
-  };
-
-  /**
-   * Replaces the existing model with the new model, by copying all the
-   * attributes.
-   *
-   * @param {Object} existing - The existing model to replace.
-   * @param {Object} model    - The model to replace the existing model with.
-   */
-  Collection.prototype.replace = function(existing, model) {
-    angular.copy(model, existing);
-  };
-
-  /**
-   * Add an array of models to the collection.
-   *
-   * @param {Array} models - An array of models to add to the collection.
-   */
-  Collection.prototype.addAll = function(models) {
-    return angular.forEach(models, _.bind(this.add, this));
-  };
-
-  /**
-   * Remove a model from the collection.
-   *
-   * @param {Object} model - The model to remove from the collection.
-   *
-   * @return {Object} The model that was provided.
-   */
-  Collection.prototype.remove = function(model) {
-    var existing = this.find(model);
-
-    if (existing) {
-      this.models.splice(_.indexOf(this.models, model), 1);
-      this._removeReference(existing);
-      this.length--;
-    }
-
-    return model;
-  };
-
-  /**
-   * Remove all models from the collection.
-   *
-   * @param {Array} models - An array of models to remove from the collection.
-   */
-  Collection.prototype.removeAll = function(models) {
-    return angular.forEach(models, _.bind(this.remove, this));
-  };
-
-  /**
-   * Reset the collection.
-   */
-  Collection.prototype.reset = function() {
-    this.models.length = 0;
-    this.length = 0;
-  };
-
-  /**
-   * Adds a reference to the provided model to reference this collection.
-   *
-   * @param {Object} model - The model to add the reference to.
-   */
-  Collection.prototype._addReference = function(model) {
-    var collection = this;
-
-    if (!model.collection) {
-      model.collection = collection;
-
-      /**
-       * A method to call restangular's remove to DELETE the resource, then
-       * remove it from the collection.
-       *
-       * @return {Promise}
-       */
-      model.destroy = function() {
-        return model.remove().then(_.bind(collection.remove, collection));
-      };
-    }
-  };
-
-  /**
-   * Removes the reference to this collection from the model.
-   *
-   * @param {Object} model - The model to remove the reference from.
-   */
-  Collection.prototype._removeReference = function(model) {
-    if (this === model.collection) {
-      delete model.collection;
-    }
-  };
-
-  /**
-   * A proxy to the underlying getList
-   */
-  Collection.prototype.getList = function() {
-    var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
-
-    return promise.then(_.bind(this.addAll, this));
-  };
+  });
 
   module.config(function(RestangularProvider) {
     RestangularProvider.setOnElemRestangularized(function(elem, isCollection, what, Restangular) {
