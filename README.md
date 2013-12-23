@@ -27,3 +27,9 @@ function PostsCtrl (posts) {
   });
 }
 ```
+
+### Releasing
+
+1. Bump the version number in `bower.json`
+2. Run `grunt build` and commit.
+3. Run `grunt-release`.
