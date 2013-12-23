@@ -72,6 +72,24 @@ describe('restangularCollections', function() {
       });
     });
 
+    describe('#destroy', function() {
+      var model, deferred;
+
+      beforeEach(function() {
+        deferred = promise();
+
+        model = { body: 'Foobar', remove: function() { return deferred.promise; } };
+
+        collection.add(model);
+      });
+
+      it('adds the resolved model to the collection', function() {
+        collection.destroy(model);
+        deferred.resolve(model);
+        expect(collection.models).to.not.contain(model);
+      });
+    });
+
     describe('#find', function() {
       var model;
 
@@ -133,11 +151,6 @@ describe('restangularCollections', function() {
       it('adds the model to the models', function() {
         collection.add(model);
         expect(collection.models).to.contain(model);
-      });
-
-      it('adds a reference to to the collection', function() {
-        collection.add(model);
-        expect(model.collection).to.eq(collection);
       });
 
       it('increments the length', function() {
@@ -219,11 +232,6 @@ describe('restangularCollections', function() {
           expect(collection.models).to.not.contain(model);
         });
 
-        it('removes the reference to the collection', function() {
-          collection.remove(model);
-          expect(model.collection).to.be.undefined;
-        });
-
         it('decrements the length', function() {
           collection.remove(model);
           expect(collection.length).to.eq(0);
@@ -282,24 +290,6 @@ describe('restangularCollections', function() {
         angular.forEach(models, function(model) {
           expect(collection.models).to.contain(model);
         });
-      });
-    });
-
-    describe('model.destroy', function() {
-      var model, deferred;
-
-      beforeEach(function() {
-        deferred = promise();
-
-        model = { id: 1, body: 'Foobar', remove: function() { return deferred.promise; } };
-
-        collection.add(model);
-      });
-
-      it('destroys the model and removes it from the collection', function() {
-        model.destroy();
-        deferred.resolve(model);
-        expect(collection.models).to.not.include(model);
       });
     });
   });

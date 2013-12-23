@@ -8,7 +8,8 @@
     var defaults = {
       id: 'id',
       methods: {
-        create: 'create'
+        create: 'create',
+        destroy: 'remove'
       }
     };
 
@@ -37,6 +38,19 @@
       var create = this.restangularElem[this.options.methods.create];
 
       return create(attributes).then(_.bind(this.add, this));
+    },
+
+    /**
+     * Destroys a model and removes it from the collection.
+     *
+     * @param {Object} model - The model to destroy.
+     *
+     * @return {Promise}
+     */
+    destroy: function(model) {
+      var destroy = model[this.options.methods.destroy];
+
+      return destroy().then(_.bind(this.remove, this));
     },
 
     /**
@@ -88,7 +102,6 @@
       } else {
         this.models.push(model);
         this.length++;
-        this._addReference(model);
       }
 
       return model;
@@ -126,7 +139,6 @@
 
       if (existing) {
         this.models.splice(_.indexOf(this.models, model), 1);
-        this._removeReference(existing);
         this.length--;
       }
 
@@ -148,40 +160,6 @@
     reset: function() {
       this.models.length = 0;
       this.length = 0;
-    },
-
-    /**
-     * Adds a reference to the provided model to reference this collection.
-     *
-     * @param {Object} model - The model to add the reference to.
-     */
-    _addReference: function(model) {
-      var collection = this;
-
-      if (!model.collection) {
-        model.collection = collection;
-
-        /**
-         * A method to call restangular's remove to DELETE the resource, then
-         * remove it from the collection.
-         *
-         * @return {Promise}
-         */
-        model.destroy = function() {
-          return model.remove().then(_.bind(collection.remove, collection));
-        };
-      }
-    },
-
-    /**
-     * Removes the reference to this collection from the model.
-     *
-     * @param {Object} model - The model to remove the reference from.
-     */
-    _removeReference: function(model) {
-      if (this === model.collection) {
-        delete model.collection;
-      }
     },
 
     /**
