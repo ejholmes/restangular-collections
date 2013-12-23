@@ -1,4 +1,4 @@
-/*! restangular-collections - v0.1.0 - 2013-12-23 */(function (angular) {
+/*! restangular-collections - v0.1.1 - 2013-12-23 */(function (angular) {
   'use strict';
   var module = angular.module('restangularCollections', ['restangular']);
   function Collection(elem, options) {
@@ -72,10 +72,27 @@
       this.models.length = 0;
       this.length = 0;
     },
-    getList: function () {
-      var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
-      return promise.then(_.bind(this.addAll, this));
+    getList: function (params, headers) {
+      if (this.options.params) {
+        params = _.defaults(this.options.params, params);
+      }
+      if (this.options.headers) {
+        headers = _.defaults(this.options.headers, headers);
+      }
+      return this._getList(params, headers);
+    },
+    get: function (id) {
+      return this._get(id);
     }
+  });
+  var proxyMethods = {
+      getList: 'addAll',
+      get: 'add'
+    };
+  angular.forEach(proxyMethods, function (action, method) {
+    Collection.prototype['_' + method] = function () {
+      return this.restangularElem[method].apply(this.restangularElem, arguments).then(_.bind(this[action], this));
+    };
   });
   module.config([
     'RestangularProvider',
