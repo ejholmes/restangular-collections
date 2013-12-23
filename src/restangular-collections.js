@@ -163,13 +163,54 @@
     },
 
     /**
-     * A proxy to the underlying getList
+     * Fetches the collection from the server merging in default params and
+     * headers.
+     *
+     * @param {Object} params  - A hash of query params.
+     * @param {Object} headers - A hash of http headers.
+     *
+     * @return {Promise}
      */
-    getList: function() {
-      var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
+    getList: function(params, headers) {
+      if (this.options.params) {
+        params = _.defaults(this.options.params, params);
+      }
 
-      return promise.then(_.bind(this.addAll, this));
+      if (this.options.headers) {
+        headers = _.defaults(this.options.headers, headers);
+      }
+
+      return this._getList(params, headers);
+    },
+
+    /**
+     * Get a single item from the server and add it to the collection.
+     *
+     * @param {Integer} id - The id of the model.
+     *
+     * @return {Promise}
+     */
+    get: function(id) {
+      return this._get(id);
     }
+  });
+
+  /**
+   * Methods that get proxied to the restangular element.
+   *
+   * The key is the restangular method and the value is the action to take once
+   * the promise is fulfilled.
+   */
+  var proxyMethods = {
+    getList: 'addAll',
+    get: 'add'
+  };
+
+  angular.forEach(proxyMethods, function(action, method) {
+    Collection.prototype['_' + method] = function() {
+      return this.restangularElem[method].apply(this.restangularElem, arguments)
+        .then(_.bind(this[action], this));
+    };
   });
 
   module.config(function(RestangularProvider) {

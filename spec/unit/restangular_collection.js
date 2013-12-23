@@ -279,13 +279,58 @@ describe('restangularCollections', function() {
         mock = sinon.mock(restangularElem);
       });
 
+      it('delegates to getList', function() {
+        mock.expects('getList').returns(deferred.promise);
+        collection.getList();
+      });
+
+      describe('when default params are present', function() {
+        beforeEach(function() {
+          collection.options.params = { foo: 'bar' };
+        });
+
+        it('passes default params', function() {
+          mock.expects('getList').withArgs({ foo: 'bar' }).returns(deferred.promise);
+          collection.getList();
+        });
+
+        it('merges supplied params', function() {
+          mock.expects('getList').withArgs({ foo: 'bar', bar: 'foo' }).returns(deferred.promise);
+          collection.getList({ bar: 'foo' });
+        });
+      });
+
+      describe('when default params are not present', function() {
+        it('passes the params', function() {
+          mock.expects('getList').withArgs({ foo: 'bar' }).returns(deferred.promise);
+          collection.getList({ foo: 'bar' });
+        });
+      });
+    });
+
+    describe('#_getList', function() {
+      var mock, deferred, models;
+
+      beforeEach(function() {
+        models = [
+          { id: 1, body: 'Foobar' },
+          { id: 2, body: 'Barfoo' }
+        ];
+
+        deferred = promise();
+
+        restangularElem.getList = function() { return deferred.promise; };
+
+        mock = sinon.mock(restangularElem);
+      });
+
       it('delegates to the restangularElem', function() {
         mock.expects('getList').withArgs(1).returns(deferred.promise);
-        collection.getList(1);
+        collection._getList(1);
       });
 
       it('adds all models to the collection when resolved', function() {
-        collection.getList();
+        collection._getList();
         deferred.resolve(models);
         angular.forEach(models, function(model) {
           expect(collection.models).to.contain(model);
