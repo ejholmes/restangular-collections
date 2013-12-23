@@ -5,6 +5,12 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: require('./bower.json'),
+    release: {
+      options: {
+        npm: false,
+        file: 'bower.json'
+      }
+    },
     karma: {
       unit: {
         configFile: 'karma.conf.js',
