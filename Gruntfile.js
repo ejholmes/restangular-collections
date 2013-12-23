@@ -7,6 +7,8 @@ module.exports = function (grunt) {
     pkg: require('./bower.json'),
     release: {
       options: {
+        bump: false,
+        add: false,
         npm: false,
         file: 'bower.json'
       }

@@ -1,10 +1,13 @@
-/*! restangular-collections - v0.0.3 - 2013-12-22 */(function (angular) {
+/*! restangular-collections - v0.1.0 - 2013-12-23 */(function (angular) {
   'use strict';
   var module = angular.module('restangularCollections', ['restangular']);
   function Collection(elem, options) {
     var defaults = {
         id: 'id',
-        methods: { create: 'create' }
+        methods: {
+          create: 'create',
+          destroy: 'remove'
+        }
       };
     this.options = _.extend(defaults, options);
     this.restangularElem = elem;
@@ -15,6 +18,10 @@
     create: function (attributes) {
       var create = this.restangularElem[this.options.methods.create];
       return create(attributes).then(_.bind(this.add, this));
+    },
+    destroy: function (model) {
+      var destroy = model[this.options.methods.destroy];
+      return destroy().then(_.bind(this.remove, this));
     },
     find: function (model) {
       var id = this.options.id, find;
@@ -41,7 +48,6 @@
       } else {
         this.models.push(model);
         this.length++;
-        this._addReference(model);
       }
       return model;
     },
@@ -55,7 +61,6 @@
       var existing = this.find(model);
       if (existing) {
         this.models.splice(_.indexOf(this.models, model), 1);
-        this._removeReference(existing);
         this.length--;
       }
       return model;
@@ -66,20 +71,6 @@
     reset: function () {
       this.models.length = 0;
       this.length = 0;
-    },
-    _addReference: function (model) {
-      var collection = this;
-      if (!model.collection) {
-        model.collection = collection;
-        model.destroy = function () {
-          return model.remove().then(_.bind(collection.remove, collection));
-        };
-      }
-    },
-    _removeReference: function (model) {
-      if (this === model.collection) {
-        delete model.collection;
-      }
     },
     getList: function () {
       var promise = this.restangularElem.getList.apply(this.restangularElem, arguments);
